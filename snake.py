@@ -3,19 +3,23 @@ import random
 import time
 import math
 
+# colour of snake and apple
 green = (0, 192, 0)
 red = (192, 0, 0)
 
+# Holds coordinates
 class Pair:
 	def __init__(self, x, y):
 		self.x = x
 		self.y = y
-		
+
+# Implementation of a linked list	
 class Node:
 	def __init__(self, pre, coor):
 		self.pre = pre
 		self.coor = coor
-		
+
+# Kind of like a linked list, but only holds the head and tail	
 class Snake:
 	def __init__(self, head, tail, length):
 		self.head = head
@@ -42,10 +46,12 @@ def moveSnake(x, y):
     global dead
     a = snake.head.coor.x
     b = snake.head.coor.y
+    # Check if snake is dead
     if a+x < 0 or a+x > 39 or b+y < 0 or b+y > 39 or grid[a+x][b+y] == 1:
         dead = True
         return
-
+	
+	# Code to make the snake length longer
     if appleX == a+x and appleY == b+y:
         apple = False
         snake.length += 1
@@ -54,6 +60,8 @@ def moveSnake(x, y):
         text = font.render(str(snake.length-1), True, (255, 255, 255))
         screen.blit(text, (10, 610))
         snake.setHead(Pair(a+x, b+y)) 
+        
+    # code to move entire snake
     else:
         snake.setHead(Pair(a+x, b+y))
         temp = snake.tail.coor
@@ -63,6 +71,7 @@ def moveSnake(x, y):
     grid[a+x][b+y] = 1
     pygame.draw.rect(screen, green, ((a+x)*15+2, (b+y)*15+2, 12, 12))
 
+# Creates random apple
 def randomApple():
     global grid
     global appleX
@@ -87,6 +96,7 @@ def main():
     apple = False
     x = 1
     y = 0
+    # create snake
     head = Node(None, Pair(20, 20))
     tail = Node(head, Pair(20, 20))
     snake = Snake(head, tail, 1)
@@ -95,6 +105,7 @@ def main():
 
     clock = pygame.time.Clock()
     
+    # main loop
     running = True
     while running:
         time.sleep(0.01)
@@ -123,10 +134,12 @@ def main():
         if not dead:
             moveSnake(x, y)
         pygame.display.update()
+        # increase value to increase speed of game
         clock.tick(13)
         moved = False
     pygame.quit()
-    
+
+# pygame stuff
 def start():
     global screen
     pygame.init()
