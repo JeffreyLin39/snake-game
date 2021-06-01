@@ -1,161 +1,140 @@
-import pygame
 import random
-import time
-import math
+import pygame
 
-# colour of snake and apple
-green = (0, 192, 0)
-red = (192, 0, 0)
-
-# Holds coordinates
-class Pair:
-	def __init__(self, x, y):
-		self.x = x
-		self.y = y
-
-# Implementation of a linked list	
+# Implementation of a linked list to represent snake
 class Node:
-	def __init__(self, pre, coor):
-		self.pre = pre
-		self.coor = coor
+        def __init__(self, next, coordinate):
+                self.next = next
+                self.coordinate = coordinate
 
-# Kind of like a linked list, but only holds the head and tail	
 class Snake:
-	def __init__(self, head, tail, length):
-		self.head = head
-		self.tail = tail
-		self.length = length
-		
-	def removeTail(self):
-		self.tail = self.tail.pre
-		
-	def setHead(self, coor):
-		temp = Node(None, coor)
-		if self.length == 1:
-			self.tail.pre = temp
-		self.head.pre = temp
-		self.head = temp
-		
-def moveSnake(x, y):
-    global running
-    global snake
-    global grid
-    global appleX
-    global appleY
-    global apple
-    global dead
-    a = snake.head.coor.x
-    b = snake.head.coor.y
-    # Check if snake is dead
-    if a+x < 0 or a+x > 39 or b+y < 0 or b+y > 39 or grid[a+x][b+y] == 1:
-        dead = True
-        return
-	
-	# Code to make the snake length longer
-    if appleX == a+x and appleY == b+y:
-        apple = False
-        snake.length += 1
-        font = pygame.font.SysFont('text.ttf', 45)
-        pygame.draw.rect(screen, (0,0,0), (0, 601, 600, 50))
-        text = font.render(str(snake.length-1), True, (255, 255, 255))
-        screen.blit(text, (10, 610))
-        snake.setHead(Pair(a+x, b+y)) 
-        
-    # code to move entire snake
-    else:
-        snake.setHead(Pair(a+x, b+y))
-        temp = snake.tail.coor
-        snake.removeTail()
-        pygame.draw.rect(screen, (0,0,0), (temp.x*15+2, temp.y*15+2, 12, 12))
-        grid[temp.x][temp.y] = 0
-    grid[a+x][b+y] = 1
-    pygame.draw.rect(screen, green, ((a+x)*15+2, (b+y)*15+2, 12, 12))
-
-# Creates random apple
-def randomApple():
-    global grid
-    global appleX
-    global appleY
-    global apple
-    apple = True
-    found = False
-    while not found:
-        appleX = random.randint(0, 39)
-        appleY = random.randint(0, 39)
-        if grid[appleX][appleY] == 0:
-            found = True
-    pygame.draw.rect(screen, red, (appleX*15+2, appleY*15+2, 12, 12))
-    
-def main():
-    global snake
-    global grid
-    global running
-    global apple
-    global dead
-    dead = False
-    apple = False
-    x = 1
-    y = 0
-    # create snake
-    head = Node(None, Pair(20, 20))
-    tail = Node(head, Pair(20, 20))
-    snake = Snake(head, tail, 1)
-    grid = [[0 for i in range(40)] for j in range(40)]
-    grid[20][20] = 1
-
-    clock = pygame.time.Clock()
-    
-    # main loop
-    running = True
-    while running:
-        time.sleep(0.01)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN and not moved and not dead:
-                if event.key == pygame.K_LEFT:
-                    x = -1
-                    y = 0
-                    moved = True
-                elif event.key == pygame.K_RIGHT:
-                    x = 1
-                    y = 0
-                    moved = True
-                elif event.key == pygame.K_UP:
-                    x = 0
-                    y = -1
-                    moved = True
-                elif event.key == pygame.K_DOWN:
-                    x = 0
-                    y = 1
-                    moved = True
-        if not apple:
-            randomApple()        
-        if not dead:
-            moveSnake(x, y)
-        pygame.display.update()
-        # increase value to increase speed of game
-        clock.tick(13)
-        moved = False
-    pygame.quit()
-
+        def __init__(self, head, tail, length):
+                self.head = head
+                self.tail = tail
+                self.length = length
+        def removeTail(self):
+                self.tail = self.tail.next 
+        def setHead(self, coordinate):
+                temp = Node(None, coordinate)
+                if self.length == 1:
+                        self.tail.next = temp
+                self.head.next = temp
+                self.head = temp
 # pygame stuff
 def start():
-    global screen
-    pygame.init()
-    screen = pygame.display.set_mode((600, 650))
-    pygame.display.set_caption("Snake")
-    screen.fill((0, 0, 0))
-	
-	# Uncomment to show grid lines
-    #for i in range (1,40):
-    #    pygame.draw.line(screen, (255,255,255), (15*i, 0), (15*i,600), 1)
-    #    pygame.draw.line(screen, (255,255,255), (0, 15*i), (600,15*i), 1)
-    pygame.draw.line(screen, (255,255,255), (0, 600), (600,600), 1)
-    font = pygame.font.SysFont('text.ttf', 45)
-    text = font.render('0', True, (255, 255, 255))
-    screen.blit(text, (10, 610))
-    pygame.display.update()
-    main()
+        global screen
+        global font
+        pygame.init()
+        screen = pygame.display.set_mode((600, 650))
+        pygame.display.set_caption("Snake")
+        pygame.draw.line(screen, (255,255,255), (0, 600), (600,600), 1)
+        font = pygame.font.SysFont(None, 45)
+        text = font.render('0', True, (255, 255, 255))
+        screen.blit(text, (10, 610))
+        pygame.display.update()
+        main()
 
+def main():
+        global snake
+        global grid
+        global gameOver
+        global apple
+        gameOver = False
+        running = True
+        # create snake
+        head = Node(None, [20, 20])
+        tail = Node(head, [20, 20])
+        snake = Snake(head, tail, 1)
+        grid = [[0 for i in range(40)] for j in range(40)]
+        grid[20][20] = 1
+        x = 1
+        y = 0
+        generateApple()
+        # main loop
+        while running:
+                for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                                running = False
+                        if event.type == pygame.KEYDOWN:
+                                if gameOver:
+                                    start() 
+                                if event.key == pygame.K_LEFT:
+                                        x = -1
+                                        y = 0
+                                elif event.key == pygame.K_RIGHT:
+                                        x = 1
+                                        y = 0
+                                elif event.key == pygame.K_UP:
+                                        x = 0
+                                        y = -1
+                                elif event.key == pygame.K_DOWN:
+                                        x = 0
+                                        y = 1
+                    
+                moveSnake(x, y)
+                pygame.time.Clock().tick(20)
+        pygame.quit()
+
+def moveSnake(x, y):
+        global gameOver
+        global font
+        global apple
+        currX = snake.head.coordinate[0]
+        currY = snake.head.coordinate[1]
+
+        newX = currX + x
+        newY = currY + y
+        # Check if snake is dead
+        if newX < 0 or newX > 39 or newY < 0 or newY > 39 or grid[newX][newY] == 1:
+            gameOver = True
+            return
+
+        # uncomment for alternate game mode
+        #if newX < 0:
+        #        newX += 40
+        #elif newX > 39:
+        #        newX %= 40
+        
+        #if newY < 0:
+        #        newY += 40
+        #elif newY > 39:
+        #        newY %= 40
+        
+        # Code to make the snake length longer
+        if grid[newX][newY] == -1:
+            snake.length += 1
+            pygame.draw.rect(screen, (0,0,0), (0, 601, 600, 50))
+            text = font.render(str(snake.length-1), True, (255, 255, 255))
+            screen.blit(text, (10, 610))
+            pygame.draw.rect(screen, (0,200,0), (newX*15+2, newY*15+2, 12, 12))
+            grid[newX][newY] = 1
+            snake.setHead([newX, newY])
+            generateApple()
+        # code to move the snake forward by 1
+        else:
+            pygame.draw.rect(screen, (0,200,0), (newX*15+2, newY*15+2, 12, 12))
+            grid[newX][newY] = 1
+            snake.setHead([newX, newY])
+                        
+            pygame.draw.rect(screen, (0,0,0), (snake.tail.coordinate[0]*15+2, snake.tail.coordinate[1]*15+2, 12, 12))
+            grid[snake.tail.coordinate[0]][snake.tail.coordinate[1]] = 0
+            snake.removeTail()
+
+
+        pygame.display.update()
+
+# Creates random apple             
+def generateApple():
+    global apple
+    global grid
+    found = False
+    while not found:
+        x = random.randint(0, 39)
+        y = random.randint(0, 39)
+        if grid[x][y] == 0:
+            found = True
+            apple = [x, y]
+            grid[x][y] = -1
+    pygame.draw.rect(screen, (200, 0, 0), (x * 15 + 2, y * 15 + 2, 12, 12))
+    pygame.display.update()
 start()
